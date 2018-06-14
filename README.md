@@ -1,6 +1,6 @@
 ## *Delemotte-summerlab*
 
-*residue-residue networks:*
+**residue-residue networks:**
 - construct networks from protein structures (you will use quite a lot of structures)
 - The aim is:
   - to extract features from all networks
