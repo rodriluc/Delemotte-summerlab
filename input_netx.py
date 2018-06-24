@@ -1,0 +1,196 @@
+#!/usr/bin/env python
+
+import networkx as nx
+import numpy as np
+from numpy import genfromtxt
+import os
+import matplotlib 
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+#from MD_cmaps import MD_cmaps
+import subprocess
+import sys
+#PATH=$PATH :/home/l/u/lucier/.local/bin/ #for bash jupyter notebook need to link path
+import scipy
+import scipy.sparse
+import mdtraj as md
+import itertools
+import pandas as pd
+from MD_cmaps import MD_cmaps
+import re
+
+'''if nodelist is None:
+	nodelist = G.nodes()
+A = nx.to_scipy_sparse_matrix(G, nodelist=nodelist, weight=weight, format='csr')
+n,m = A.shape
+diags = A.sum(axis=1).flatten()
+D = scipy.sparse.spdiags(diags, [0], m, n, format='csr')
+L = D - A
+with scipy.errstate(divide='ignore'):
+	diags_sqrt = 1.0/scipy.sqrt(diags)
+diags_sqrt[scipy.isinf(diags_sqrt)] = 0
+DH = scipy.sparse.spdiags(diags_sqrt, [0], m, n, format='csr')
+return DH.dot(L.dot(DH))'''
+
+def install(package):
+	subprocess.call([sys.executable, "-m", "pip", "install", package])
+	
+#def __init__():
+	#return
+
+def input_nx(): 
+	#cmap = MD_cmaps().getContactMap()
+	for file in os.listdir('/afs/kth.se/home/l/u/lucier/Documents/protein_networks/Results_data'):
+		if file.startswith('cmap_processed_'): #distance_matrix or cmap_processed
+
+			#A = genfromtxt(file, delimiter=' ') #usecols=range(0,ncols-1)
+			'''A = np.fromfile(file, dtype=float)
+			B = A.shape
+			print(B)
+			G = nx.from_numpy_matrix(A)'''
+			
+			# can also use genfromtxt(file) instead of loadtxt
+			A = np.loadtxt(file, dtype=float, unpack=True) #usecols=(0, -1) blank line at end
+			B = np.matrix(np.array(A))
+			#print(B)
+			G = nx.from_numpy_matrix(B)
+			#G = nx.Graph(G)
+			nx.draw(G)
+			
+			#label nodes with amino acid residues
+			'''labels = {}    
+			for node in G.nodes():
+				if node in dict_labels:
+					#set the node name as the key and the label as its value 
+					labels[node] = node
+			nx.draw_networkx_labels(G,pos,labels,font_size=16,font_color='r')'''
+			
+			plt.show()
+			plt.savefig('cmap.svg' )
+			print 'Figure has been saved as *.svg' #called twice so prints twice
+			return G
+			
+def attributes_graph(n = None):
+	G = input_nx()
+	#G = nx.Graph(G)
+	num_nodes = nx.number_of_nodes(G)
+	num_edges = nx.number_of_edges(G)
+	avg = float(num_edges)/float(num_nodes)
+	print '***Statistic attributes of networks***', '\n'
+	print 'Number of nodes: ',num_nodes
+	print 'Number of edges: ',num_edges
+	print 'Average degree: ',avg
+	print 'Average shortest path length: ',nx.average_shortest_path_length(G)
+	print 'Diameter (max. shortest path): ',nx.diameter(G)
+	print 'Radius (min. shortest path): ',nx.radius(G)
+	print 'Average local clustering: ',nx.clustering(G) #local
+	print 'Average global clustering: ',nx.average_clustering(G) #global
+	#Eigenvalue of laplacian, L = D - A
+	print 'Laplacian matrix of G', '\n'
+	print nx.laplacian_matrix(G, weight='weight')
+	#Normalized laplacian matrix, N = D^{-1/2} L D^{-1/2}
+	print 'Normalized laplacian matrix of G', '\n'
+	print nx.normalized_laplacian_matrix(G, weight='weight')
+	print 'Degree assortativity coefficient: ',nx.degree_assortativity_coefficient(G)
+
+
+def features_vector():
+	G = input_nx()
+	g = nx.DiGraph(G)
+	num_nodes = nx.number_of_nodes(G)
+	num_edges = nx.number_of_edges(G)
+	
+	#Average degree of hydrophobic residues (F,M,W,I,V,L,P,A)
+	for file in os.listdir('/afs/kth.se/home/l/u/lucier/Documents/protein_networks'):
+		if file.endswith('.pdb'): 
+			base = file[:4] 
+			with open ('hydrophobic_'+base+'.txt', 'w') as w:
+				top = md.load_pdb(file).topology
+				hydrophobic_list = top.select('resname PHE MET TRP ILE VAL LEU PRO ALA')
+				#print hydrophobic_list
+				for line in enumerate(top): #add 2
+					#print line
+					
+
+	'''for file in os.listdir('/afs/kth.se/home/l/u/lucier/Documents/protein_networks'):
+		if file.endswith('.pdb'):
+			base = file[:4]
+			with open ('features_'+base+'.txt', 'w') as w:
+				top = md.load_pdb(file).topology
+				#resid = ['PHE','MET','TRP','ILE','VAL','LEU','PRO','ALA']
+				#res_list = []
+				
+				#for residues in top.topology.residues:
+				hydrophobic_list = top.select('resname PHE MET TRP ILE VAL LEU PRO ALA')
+				print hydrophobic_list
+				#for line in file:
+					#if re.match(hydrophobic_list, line):
+						
+				#cm = cm(hydrophobic_list)
+				#print cm
+				#for residues in top.select('resname PHE'):
+					#print residues
+					#res_list.append(residue)
+					#hydrophobic_list = [name for name in res_list if (name[0:3] in resid)]
+					#if residues == top.select('resname PHE').all():
+						#print residues
+					#if residue != hydrophobic_list:
+						#hydrophobic_list.append(residue)
+						#pho = residue #everything but hydrophobic
+						#G = nx.from_numpy_matrix(B)
+				pho = nx.Graph(Phe)
+				#pho.add_nodes_from(hydrophobic_list) #remove_nodes_from
+				nx.draw(pho)
+				plt.savefig('hydrophobic.svg')
+				print(top.select('resname PHE'))
+				print(nx.number_of_edges(pho))
+				print(nx.number_of_nodes(pho))
+				w.write('hydrophobic avg degree below'+'\n') #test where result is
+				w.write(str(float(nx.number_of_edges(pho))/float(nx.number_of_nodes(pho)))+'\n')
+					
+					#else:
+				w.write(str(float(num_edges)/float(num_nodes))+'\n') #avg degree
+				w.write(str(nx.average_shortest_path_length(G))+'\n') #avg shortest path length
+				w.write(str(nx.diameter(G))+'\n') #diameter (max. shortest path)
+				w.write(str(nx.radius(G))+'\n') #radius (min. shortest path)
+				#w.write(str(nx.clustering(G))) #local clustering coefficient (individual nodes)
+				w.write(str(nx.average_clustering(G))+'\n') #global clustering coefficient
+				#***Number of quasi-rigid domains
+				#w.write(str(nx.laplacian_matrix(G, weight='weight'))+'\n') #Eigenvalue of laplacian, L = D - A
+				w.write(str(nx.normalized_laplacian_matrix(G, weight='weight'))+'\n') #Normalized laplacian matrix, N = D^{-1/2} L D^{-1/2}
+				w.write(str(nx.degree_assortativity_coefficient(G))+'\n') #assortativity coefficient
+				w.write(str(nx.degree_centrality(G))+'\n') #global reaching centrality
+				#***Residue intrinsic dimensionality (may be used to compute 6.?)
+
+				
+				top = [residue for residue in top.chain().residues if residue == hydrophobic_resid]
+				print (top)
+				topology = md.load_pdb(file).topology
+				table, bonds = topology.to_dataframe()
+				print(table.head())
+				a = [d for n,d in G.nodes_iter(data=True)]
+				
+				g = nx.Graph()
+				g.add_nodes_from(self.atoms)
+				#g.add_edges_from(self.bonds)
+				#print(top.select('resname Phe'))
+				if 	top.select('resname == Phe'):
+					top == 1 #assign 1 if hydrophobic
+				else:
+					top == 0 #assign 0 if hydrophilic
+				g = nx.Graph(top)
+				w.write(str(float(nx.number_of_edges(g))/float(nx.number_of_nodes(g)))+'\n')'''
+				#***Average degree of charged residues (R,D,E,H,K)
+				#***Average local clustering coefficient of hydrophobic residues
+				#***Average local clustering coefficient of charged residues
+				#***Average local reaching centrality of hydrophobic residues
+				#***Average local reaching centrality of charged residues
+				#***Secondary structure content (helix content + beta strand content)
+	
+	print 'Features vector *.txt file has been saved!'''
+
+if __name__ == '__main__':
+	#install('networkx') #satisfied
+	#print(input_nx()) 
+	#print(attributes_graph())
+	print(features_vector())
