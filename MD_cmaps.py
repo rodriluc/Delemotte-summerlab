@@ -21,8 +21,8 @@ import numpy as np
 from scipy import stats
 from scipy.spatial.distance import squareform, pdist, cdist
 from joblib import Parallel, delayed
-import MD_init
 
+path_data = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/Results_data/'
 
 def unwrap_cmap_loop(arg,**kwarg):
 	return MD_cmaps.distance_matrix_loop(*arg,**kwarg);
@@ -569,9 +569,9 @@ class MD_cmaps():
       #load PDB file as traj
 		args = parser.parse_args()
         
-		for file in os.listdir('/afs/kth.se/home/l/u/lucier/Documents/protein_networks/'):
+		for file in os.listdir(path_data):
 			if file.endswith('.pdb'):
-				self.traj = md.load_pdb(file)
+				self.traj = md.load_pdb(path_data+file) #args.topology_file
 				print(self.traj)
 				
  
@@ -611,4 +611,5 @@ if __name__ == '__main__':
     
 	parser = argparse.ArgumentParser(epilog='Residue-residue distance maps. Annie Westerlund 2017.');
 	cmaps_obj = MD_cmaps();
+	
 	cmaps_obj.main(parser);

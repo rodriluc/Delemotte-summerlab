@@ -7,7 +7,6 @@ import os
 import matplotlib 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-#from MD_cmaps import MD_cmaps
 import subprocess
 import sys
 #PATH=$PATH :/home/l/u/lucier/.local/bin/ #for bash jupyter notebook need to link path
@@ -16,55 +15,46 @@ import scipy.sparse
 import mdtraj as md
 import itertools
 import pandas as pd
-from MD_cmaps import MD_cmaps
 import re
 
-'''if nodelist is None:
-	nodelist = G.nodes()
-A = nx.to_scipy_sparse_matrix(G, nodelist=nodelist, weight=weight, format='csr')
-n,m = A.shape
-diags = A.sum(axis=1).flatten()
-D = scipy.sparse.spdiags(diags, [0], m, n, format='csr')
-L = D - A
-with scipy.errstate(divide='ignore'):
-	diags_sqrt = 1.0/scipy.sqrt(diags)
-diags_sqrt[scipy.isinf(diags_sqrt)] = 0
-DH = scipy.sparse.spdiags(diags_sqrt, [0], m, n, format='csr')
-return DH.dot(L.dot(DH))'''
+python_path = os.path.dirname(__file__);
+
+next_folder = '';
+parent_folder = '';
+for i in range(len(python_path)-1):
+	next_folder+=python_path[i];
+	if python_path[i]=='/':
+		parent_folder += next_folder;
+		next_folder = '';
+		
+sys.path.append(python_path);
+sys.path.append(parent_folder);
+
+import MD_cmaps
+
+path_data = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/Results_data/'
 
 def install(package):
 	subprocess.call([sys.executable, "-m", "pip", "install", package])
 	
-#def __init__():
-	#return
+def __init__():
+	return
 
 def input_nx(): 
-	#cmap = MD_cmaps().getContactMap()
-	for file in os.listdir('/afs/kth.se/home/l/u/lucier/Documents/protein_networks/Results_data'):
-		if file.startswith('cmap_processed_'): #distance_matrix or cmap_processed
 
+	for file in os.listdir(path_data):
+		print file
+		if file.startswith('cmap_processed_'): #distance_matrix or cmap_processed
+			#print file
 			#A = genfromtxt(file, delimiter=' ') #usecols=range(0,ncols-1)
-			'''A = np.fromfile(file, dtype=float)
-			B = A.shape
-			print(B)
-			G = nx.from_numpy_matrix(A)'''
-			
 			# can also use genfromtxt(file) instead of loadtxt
-			A = np.loadtxt(file, dtype=float, unpack=True) #usecols=(0, -1) blank line at end
+			A = np.loadtxt(path_data+file, dtype=float, unpack=True) #usecols=(0, -1) blank line at end
 			B = np.matrix(np.array(A))
 			#print(B)
 			G = nx.from_numpy_matrix(B)
 			#G = nx.Graph(G)
 			nx.draw(G)
-			
-			#label nodes with amino acid residues
-			'''labels = {}    
-			for node in G.nodes():
-				if node in dict_labels:
-					#set the node name as the key and the label as its value 
-					labels[node] = node
-			nx.draw_networkx_labels(G,pos,labels,font_size=16,font_color='r')'''
-			
+
 			plt.show()
 			plt.savefig('cmap.svg' )
 			print 'Figure has been saved as *.svg' #called twice so prints twice
@@ -101,18 +91,29 @@ def features_vector():
 	num_edges = nx.number_of_edges(G)
 	
 	#Average degree of hydrophobic residues (F,M,W,I,V,L,P,A)
-	for file in os.listdir('/afs/kth.se/home/l/u/lucier/Documents/protein_networks'):
+	for file in os.listdir(path_data):
 		if file.endswith('.pdb'): 
+			iter_file = open(file)
+			#with open(file) as iter_file:
+			lines = iter_file.readlines()
+			head = lines[0]
+			#print iter_file
 			base = file[:4] 
-			with open ('hydrophobic_'+base+'.txt', 'w') as w:
+			with open ('hydrophobic_'+base+'.pdb', 'w') as w:
+				w.write(head)
 				top = md.load_pdb(file).topology
 				hydrophobic_list = top.select('resname PHE MET TRP ILE VAL LEU PRO ALA')
 				#print hydrophobic_list
-				for line in enumerate(top): #add 2
-					#print line
+				T = [lines[i] for i in hydrophobic_list]
+				for line in T:
+					if line.rstrip():
+						w.write(line) 
+				w.write('END')
+				w.write('\n')
+				print 'Hydrophobic file saved!'
 					
 
-	'''for file in os.listdir('/afs/kth.se/home/l/u/lucier/Documents/protein_networks'):
+	'''for file in os.listdir(path_data):
 		if file.endswith('.pdb'):
 			base = file[:4]
 			with open ('features_'+base+'.txt', 'w') as w:
