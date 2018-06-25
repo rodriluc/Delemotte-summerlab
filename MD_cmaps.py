@@ -317,13 +317,13 @@ class MD_cmaps():
 
 	def distance_matrix_loop(self,i):
 		print(str(i+1)+'/'+str(self.nResidues));
-		for j in range(i,self.nResidues):
+		for j in range(i+1,self.nResidues): # i before
 
 			atomInd1 = self.allInds[i];
 			atomInd2 = self.allInds[j];
 			
 			atom_pairs = self.getAtomPairs(atomInd1, atomInd2);
-			#print atom_pairs;
+			
 			distances = md.compute_distances(self.traj, atom_pairs, periodic=False);
 			#may have to compute distances myself if pdb_load error
             
@@ -334,6 +334,7 @@ class MD_cmaps():
 				print('The chosen residue does not exist!');
 
 			# The distance between residues is min distance between all heavy atoms. Take mean over all frames.
+			
 			self.distanceMatrix[i,j] = np.mean(np.min(distances,axis=1),axis=0);
 			self.distanceMatrix[j,i] = np.mean(np.min(distances,axis=1),axis=0);
 			
@@ -546,7 +547,7 @@ class MD_cmaps():
 		parser.add_argument('-cmap_diff','--cmap_difference_to_start',help='Contact map distance to starting frame.', action='store_true');
 		
 		parser.add_argument('-cmap_diff_1_resid','--cmap_difference_to_start_one_resid',help='Contact map distance to starting frame for specific resid to all others.', action='store_true');
-		parser.add_argument('-top','--topology_file',help='Input 1 topology file (.gro, .pdb, etc)',type=str,default='',nargs='+')
+		parser.add_argument('-top','--topology_file',help='Input 1 topology file (.gro, .pdb, etc)',type=str,default='') #removed nargs=''
 		parser.add_argument('-trj','--trajectory_files',help='Input trajectory files (.xtc, .dcd, etc)',nargs='+',default='')
 
 		parser.add_argument('-build','--build_subunits',help='Superpose the sub-units (optional).',action='store_true')
@@ -572,40 +573,41 @@ class MD_cmaps():
 		for file in os.listdir(path_data):
 			if file.endswith('.pdb'):
 				self.traj = md.load_pdb(path_data+file) #args.topology_file
+		#self.traj = md.load_pdb(args.topology_file);
 				print(self.traj)
 				
  
-		self.save_folder = args.out_directory;
-		self.file_end_name = args.file_end_name;
-		self.nResidues = int(self.traj.n_residues);		
+				self.save_folder = args.out_directory;
+				self.file_end_name = args.file_end_name;
+				self.nResidues = int(self.traj.n_residues);
 
-		startID = int(args.startID);		
-		endID = int(args.endID);
+				startID = int(args.startID);		
+				endID = int(args.endID);
 		
 
-		if args.frame_frame_side_chain_cmap:
-			self.computeFrameToFrameSideChainContacts(self.traj,args.query);
+				if args.frame_frame_side_chain_cmap:
+					self.computeFrameToFrameSideChainContacts(self.traj,args.query);
+				
+				if args.frame_frame_CA_cmap:
+					self.computeFrameToFrameCalphaContacts(self.traj, args.query);
 		
-		if args.frame_frame_CA_cmap:
-			self.computeFrameToFrameCalphaContacts(self.traj, args.query);
-
-		if args.frame_frame_CA_cmap_memory:
-			self.computeFrameToFrameCalpaContactsMemory(self.traj, args.query);
-		
-		if args.side_chain_cmap:
-			self.computeAverageSideChainMinDistanceMap(startID, endID, args.query);
-		
-		if args.side_chain_cmap_semi_binary:
-			self.computeAverageSideChainSemiBinCmap(startID, endID, args.query);
-		
-		if args.binary_cmap:
-			if args.distance_matrix_in != '':
-				self.cmap = squareform(np.loadtxt(args.distance_matrix_in));
-				print(self.cmap.shape)
-			self.getContactMap(self.cmap, float(args.cutoff), makeBinary=True);
-	
-		if args.cmap_difference_to_start:
-			self.computeCalpaCmapDistanceToFrame1(self.traj, args.query, args.cmap_difference_to_start_one_resid, startID);
+				if args.frame_frame_CA_cmap_memory:
+					self.computeFrameToFrameCalpaContactsMemory(self.traj, args.query);
+				
+				if args.side_chain_cmap:
+					self.computeAverageSideChainMinDistanceMap(startID, endID, args.query);
+				
+				if args.side_chain_cmap_semi_binary:
+					self.computeAverageSideChainSemiBinCmap(startID, endID, args.query);
+				
+				if args.binary_cmap:
+					if args.distance_matrix_in != '':
+						self.cmap = squareform(np.loadtxt(args.distance_matrix_in));
+						print(self.cmap.shape)
+					self.getContactMap(self.cmap, float(args.cutoff), makeBinary=True);
+			
+				if args.cmap_difference_to_start:
+					self.computeCalpaCmapDistanceToFrame1(self.traj, args.query, args.cmap_difference_to_start_one_resid, startID);
 		
 if __name__ == '__main__':
     

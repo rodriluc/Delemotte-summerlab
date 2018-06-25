@@ -32,7 +32,9 @@ sys.path.append(parent_folder);
 
 import MD_cmaps
 
-path_data = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/Results_data/'
+path_data = 'Results_data/'
+path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/'
+
 
 def install(package):
 	subprocess.call([sys.executable, "-m", "pip", "install", package])
@@ -41,17 +43,17 @@ def __init__():
 	return
 
 def input_nx(): 
-
+	
 	for file in os.listdir(path_data):
-		print file
-		if file.startswith('cmap_processed_'): #distance_matrix or cmap_processed
-			#print file
+		#print file
+		if file.startswith('cmap_processed_'): #'/cmap_processed_'
+
 			#A = genfromtxt(file, delimiter=' ') #usecols=range(0,ncols-1)
 			# can also use genfromtxt(file) instead of loadtxt
 			A = np.loadtxt(path_data+file, dtype=float, unpack=True) #usecols=(0, -1) blank line at end
 			B = np.matrix(np.array(A))
-			#print(B)
 			G = nx.from_numpy_matrix(B)
+			#print B
 			#G = nx.Graph(G)
 			nx.draw(G)
 
@@ -91,7 +93,8 @@ def features_vector():
 	num_edges = nx.number_of_edges(G)
 	
 	#Average degree of hydrophobic residues (F,M,W,I,V,L,P,A)
-	for file in os.listdir(path_data):
+	for file in os.listdir(path_pdb):
+		#print file
 		if file.endswith('.pdb'): 
 			iter_file = open(file)
 			#with open(file) as iter_file:
@@ -99,12 +102,14 @@ def features_vector():
 			head = lines[0]
 			#print iter_file
 			base = file[:4] 
+			top = md.load_pdb(file).topology
 			with open ('hydrophobic_'+base+'.pdb', 'w') as w:
 				w.write(head)
-				top = md.load_pdb(file).topology
+				#print top
 				hydrophobic_list = top.select('resname PHE MET TRP ILE VAL LEU PRO ALA')
-				#print hydrophobic_list
-				T = [lines[i] for i in hydrophobic_list]
+				new_list = [x+1 for x in hydrophobic_list]
+				#print new_list
+				T = [lines[i] for i in new_list] #new_list
 				for line in T:
 					if line.rstrip():
 						w.write(line) 
