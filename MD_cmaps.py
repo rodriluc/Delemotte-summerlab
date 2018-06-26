@@ -56,11 +56,7 @@ class MD_cmaps():
 		if makeBinary:
 			contactMap = contactMap > 0;
             
-		'''mat = np.matrix(contactMap)
-		with open(self.save_folder + 'cmap_processed_' + self.file_end_name + '.txt','wb') as f:
-			for line in mat:
-				np.savetxt(f,line,fmt='%.2f')'''
-		np.save(self.save_folder + 'cmap_processed_' + self.file_end_name + '.txt',contactMap);
+		np.savetxt(self.save_folder + 'cmap_processed_' + self.file_end_name + '.txt',contactMap);
 		print('Saved cmap!') #savetxt
 		print(contactMap.shape)
 		return;
@@ -434,10 +430,10 @@ class MD_cmaps():
 		
 		print(self.distanceMatrix);
 		self.cmap = self.distanceMatrix;
-		
+
 		# Save distance matrix to file
 		np.savetxt(self.save_folder + 'distance_matrix_min_' + self.file_end_name + '.txt',squareform(self.distanceMatrix));
-		
+		#print(self.save_folder + 'distance_matrix_min_' + self.file_end_name + '.txt')
 		print('Data saved to file!');
 		return;
 
@@ -569,46 +565,47 @@ class MD_cmaps():
 
       #load PDB file as traj
 		args = parser.parse_args()
-        
-		for file in os.listdir(path_data):
-			if file.endswith('.pdb'):
-				self.traj = md.load_pdb(path_data+file) #args.topology_file
-		#self.traj = md.load_pdb(args.topology_file);
-				print(self.traj)
-				
- 
-				self.save_folder = args.out_directory;
-				self.file_end_name = args.file_end_name;
-				self.nResidues = int(self.traj.n_residues);
-
-				startID = int(args.startID);		
-				endID = int(args.endID);
 		
-
-				if args.frame_frame_side_chain_cmap:
-					self.computeFrameToFrameSideChainContacts(self.traj,args.query);
-				
-				if args.frame_frame_CA_cmap:
-					self.computeFrameToFrameCalphaContacts(self.traj, args.query);
+		startID = int(args.startID);		
+		endID = int(args.endID);
 		
-				if args.frame_frame_CA_cmap_memory:
-					self.computeFrameToFrameCalpaContactsMemory(self.traj, args.query);
-				
-				if args.side_chain_cmap:
-					self.computeAverageSideChainMinDistanceMap(startID, endID, args.query);
-				
-				if args.side_chain_cmap_semi_binary:
-					self.computeAverageSideChainSemiBinCmap(startID, endID, args.query);
-				
-				if args.binary_cmap:
-					if args.distance_matrix_in != '':
-						self.cmap = squareform(np.loadtxt(args.distance_matrix_in));
-						print(self.cmap.shape)
-					self.getContactMap(self.cmap, float(args.cutoff), makeBinary=True);
+		self.save_folder = args.out_directory;
+		self.file_end_name = args.file_end_name;
+		
+		#for file in os.listdir(path_data):
+			#if file.endswith('.pdb'):
+				#self.traj = md.load_pdb(path_data+file) #args.topology_file
+		if args.topology_file != '':
+			self.traj = md.load_pdb(args.topology_file);
+			print(self.traj)
+			self.nResidues = int(self.traj.n_residues);
 			
-				if args.cmap_difference_to_start:
-					self.computeCalpaCmapDistanceToFrame1(self.traj, args.query, args.cmap_difference_to_start_one_resid, startID);
-		
+	 		if args.frame_frame_side_chain_cmap:
+				self.computeFrameToFrameSideChainContacts(self.traj,args.query);
+			
+			if args.frame_frame_CA_cmap:
+				self.computeFrameToFrameCalphaContacts(self.traj, args.query);
+	
+			if args.frame_frame_CA_cmap_memory:
+				self.computeFrameToFrameCalpaContactsMemory(self.traj, args.query);
+			
+			if args.side_chain_cmap:
+				self.computeAverageSideChainMinDistanceMap(startID, endID, args.query);
+			
+			if args.side_chain_cmap_semi_binary:
+				self.computeAverageSideChainSemiBinCmap(startID, endID, args.query);
+			
+			if args.cmap_difference_to_start:
+				self.computeCalpaCmapDistanceToFrame1(self.traj, args.query, args.cmap_difference_to_start_one_resid, startID);
+			
+
+		if args.binary_cmap:
+			if args.distance_matrix_in != '':
+				self.cmap = squareform(np.loadtxt(args.distance_matrix_in));
+				print(self.cmap.shape)
+			self.getContactMap(self.cmap, float(args.cutoff), makeBinary=True);
+	
+
 if __name__ == '__main__':
     
 	parser = argparse.ArgumentParser(epilog='Residue-residue distance maps. Annie Westerlund 2017.');

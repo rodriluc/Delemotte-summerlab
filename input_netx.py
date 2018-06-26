@@ -84,119 +84,86 @@ def attributes_graph(n = None):
 	print 'Normalized laplacian matrix of G', '\n'
 	print nx.normalized_laplacian_matrix(G, weight='weight')
 	print 'Degree assortativity coefficient: ',nx.degree_assortativity_coefficient(G)
-
-
-def features_vector():
-	G = input_nx()
-	g = nx.DiGraph(G)
-	num_nodes = nx.number_of_nodes(G)
-	num_edges = nx.number_of_edges(G)
 	
-	#Average degree of hydrophobic residues (F,M,W,I,V,L,P,A)
+def name_base():
 	for file in os.listdir(path_pdb):
-		#print file
-		if file.endswith('.pdb'): 
-			iter_file = open(file)
-			#with open(file) as iter_file:
-			lines = iter_file.readlines()
-			head = lines[0]
-			#print iter_file
-			base = file[:4] 
-			top = md.load_pdb(file).topology
-			with open ('hydrophobic_'+base+'.pdb', 'w') as w:
-				w.write(head)
-				#print top
-				hydrophobic_list = top.select('resname PHE MET TRP ILE VAL LEU PRO ALA')
-				new_list = [x+1 for x in hydrophobic_list]
-				#print new_list
-				T = [lines[i] for i in new_list] #new_list
-				for line in T:
-					if line.rstrip():
-						w.write(line) 
-				w.write('END')
-				w.write('\n')
-				print 'Hydrophobic file saved!'
-					
-
-	'''for file in os.listdir(path_data):
-		if file.endswith('.pdb'):
+		if file.endswith('.pdb') and not file.startswith('hydrophobic') and not file.startswith('charged'):
 			base = file[:4]
-			with open ('features_'+base+'.txt', 'w') as w:
-				top = md.load_pdb(file).topology
-				#resid = ['PHE','MET','TRP','ILE','VAL','LEU','PRO','ALA']
-				#res_list = []
-				
-				#for residues in top.topology.residues:
-				hydrophobic_list = top.select('resname PHE MET TRP ILE VAL LEU PRO ALA')
-				print hydrophobic_list
-				#for line in file:
-					#if re.match(hydrophobic_list, line):
-						
-				#cm = cm(hydrophobic_list)
-				#print cm
-				#for residues in top.select('resname PHE'):
-					#print residues
-					#res_list.append(residue)
-					#hydrophobic_list = [name for name in res_list if (name[0:3] in resid)]
-					#if residues == top.select('resname PHE').all():
-						#print residues
-					#if residue != hydrophobic_list:
-						#hydrophobic_list.append(residue)
-						#pho = residue #everything but hydrophobic
-						#G = nx.from_numpy_matrix(B)
-				pho = nx.Graph(Phe)
-				#pho.add_nodes_from(hydrophobic_list) #remove_nodes_from
-				nx.draw(pho)
-				plt.savefig('hydrophobic.svg')
-				print(top.select('resname PHE'))
-				print(nx.number_of_edges(pho))
-				print(nx.number_of_nodes(pho))
-				w.write('hydrophobic avg degree below'+'\n') #test where result is
-				w.write(str(float(nx.number_of_edges(pho))/float(nx.number_of_nodes(pho)))+'\n')
-					
-					#else:
-				w.write(str(float(num_edges)/float(num_nodes))+'\n') #avg degree
-				w.write(str(nx.average_shortest_path_length(G))+'\n') #avg shortest path length
-				w.write(str(nx.diameter(G))+'\n') #diameter (max. shortest path)
-				w.write(str(nx.radius(G))+'\n') #radius (min. shortest path)
-				#w.write(str(nx.clustering(G))) #local clustering coefficient (individual nodes)
-				w.write(str(nx.average_clustering(G))+'\n') #global clustering coefficient
-				#***Number of quasi-rigid domains
-				#w.write(str(nx.laplacian_matrix(G, weight='weight'))+'\n') #Eigenvalue of laplacian, L = D - A
-				w.write(str(nx.normalized_laplacian_matrix(G, weight='weight'))+'\n') #Normalized laplacian matrix, N = D^{-1/2} L D^{-1/2}
-				w.write(str(nx.degree_assortativity_coefficient(G))+'\n') #assortativity coefficient
-				w.write(str(nx.degree_centrality(G))+'\n') #global reaching centrality
-				#***Residue intrinsic dimensionality (may be used to compute 6.?)
+			return base
 
+def load_hydrophobic():
+	base = name_base()
+
+	for file in os.listdir(path_data):
+		if file.startswith('cmap_processed_hydrophobic'): #'cmap_processed_hydrophobic'
+			A = np.loadtxt(path_data+file, dtype=float, unpack=True) 
+			B = np.matrix(np.array(A))
+			H = nx.from_numpy_matrix(B)
+			nx.draw(H)
+			plt.show()
+			plt.savefig('cmap_hydrophobic.svg' )
+			#print 'Figure has been saved as *.svg' 
+			return H
 				
-				top = [residue for residue in top.chain().residues if residue == hydrophobic_resid]
-				print (top)
-				topology = md.load_pdb(file).topology
-				table, bonds = topology.to_dataframe()
-				print(table.head())
-				a = [d for n,d in G.nodes_iter(data=True)]
-				
-				g = nx.Graph()
-				g.add_nodes_from(self.atoms)
-				#g.add_edges_from(self.bonds)
-				#print(top.select('resname Phe'))
-				if 	top.select('resname == Phe'):
-					top == 1 #assign 1 if hydrophobic
-				else:
-					top == 0 #assign 0 if hydrophilic
-				g = nx.Graph(top)
-				w.write(str(float(nx.number_of_edges(g))/float(nx.number_of_nodes(g)))+'\n')'''
-				#***Average degree of charged residues (R,D,E,H,K)
-				#***Average local clustering coefficient of hydrophobic residues
-				#***Average local clustering coefficient of charged residues
-				#***Average local reaching centrality of hydrophobic residues
-				#***Average local reaching centrality of charged residues
-				#***Secondary structure content (helix content + beta strand content)
+def load_charged():
+	base = name_base()
 	
-	print 'Features vector *.txt file has been saved!'''
+	for file in os.listdir(path_data):
+		if file.startswith('cmap_processed_charged'): #'cmap_processed_charged'
+			A = np.loadtxt(path_data+file, dtype=float, unpack=True) 
+			B = np.matrix(np.array(A))
+			C = nx.from_numpy_matrix(B)
+			nx.draw(C)
+			plt.show()
+			plt.savefig('cmap_charged.svg' )
+			#print 'Figure has been saved as *.svg' 
+			return C
+	
+def features_vector():
+	base = name_base()
+	G = input_nx()
+	H = load_hydrophobic()
+	C = load_charged()
+
+	with open ('features_'+base+'.txt', 'w') as w:
+		for file in os.listdir(path_pdb):
+			if file.endswith('.pdb'):
+				if file.startswith('hydrophobic'):
+					#***Average degree of hydrophobic residues (F,M,W,I,V,L,P,A)
+					w.write(str(float(nx.number_of_edges(H))/float(nx.number_of_nodes(H)))+'\n')
+					#***Average local clustering coefficient of hydrophobic residues
+					w.write(str(nx.clustering(H))+'\n')
+					#***Average local reaching centrality of hydrophobic residues
+					w.write(str(nx.local_reaching_centrality(H,3))+'\n') #needs second parameter, the node
+				elif file.startswith('charged'):
+					#***Average degree of charged residues (R,D,E,H,K)
+					w.write(str(float(nx.number_of_edges(C))/float(nx.number_of_nodes(C)))+'\n')
+					#***Average local clustering coefficient of charged residues
+					w.write(str(nx.clustering(C))+'\n')
+					#***Average local reaching centrality of charged residues
+					w.write(str(nx.local_reaching_centrality(C,3))+'\n')
+				else:
+					w.write(str(float(nx.number_of_edges(G))/float(nx.number_of_nodes(G)))+'\n') #avg degree
+					w.write(str(nx.average_shortest_path_length(G))+'\n') #avg shortest path length
+					w.write(str(nx.diameter(G))+'\n') #diameter (max. shortest path)
+					w.write(str(nx.radius(G))+'\n') #radius (min. shortest path)
+					#w.write(str(nx.clustering(G))) #local clustering coefficient (individual nodes)
+					w.write(str(nx.average_clustering(G))+'\n') #global clustering coefficient
+					#***Number of quasi-rigid domains
+					#w.write(str(nx.laplacian_matrix(G, weight='weight'))+'\n') #Eigenvalue of laplacian, L = D - A
+					w.write(str(nx.normalized_laplacian_matrix(G, weight='weight'))+'\n') #Normalized laplacian matrix, N = D^{-1/2} L D^{-1/2}
+					w.write(str(nx.degree_assortativity_coefficient(G))+'\n') #assortativity coefficient
+					w.write(str(nx.degree_centrality(G))) #global reaching centrality
+					#***Residue intrinsic dimensionality (may be used to compute 6.?)
+					#***Secondary structure content (helix content + beta strand content)
+	
+	print 'Features vector *.txt file has been saved!'
 
 if __name__ == '__main__':
 	#install('networkx') #satisfied
 	#print(input_nx()) 
 	#print(attributes_graph())
-	print(features_vector())
+	name_base()
+	load_hydrophobic()
+	load_charged()
+	features_vector()
