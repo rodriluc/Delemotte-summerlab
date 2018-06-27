@@ -90,6 +90,33 @@ def name_base():
 		if file.endswith('.pdb') and not file.startswith('hydrophobic') and not file.startswith('charged'):
 			base = file[:4]
 			return base
+		
+def alpha_content():
+
+	base = name_base()
+	for file in os.listdir(path_pdb):
+		#print file
+		if file.endswith('.pdb') and not file.startswith('hydrophobic') and not file.startswith('charged'): 
+			#print file
+			iter_file = open(file)
+			lines = iter_file.readlines()
+			cryst = lines[0]
+			#print cryst
+			for i in range(len(cryst)):
+				return cryst[12:18]
+			
+def beta_content():
+	base = name_base()
+	for file in os.listdir(path_pdb):
+		#print file
+		if file.endswith('.pdb') and not file.startswith('hydrophobic') and not file.startswith('charged'): 
+			#print file
+			iter_file = open(file)
+			lines = iter_file.readlines()
+			cryst = lines[0]
+			#print cryst
+			for i in range(len(cryst)):
+				return cryst[21:27]
 
 def load_hydrophobic():
 	base = name_base()
@@ -124,6 +151,8 @@ def features_vector():
 	G = input_nx()
 	H = load_hydrophobic()
 	C = load_charged()
+	A = alpha_content()
+	B = beta_content()
 
 	with open ('features_'+base+'.txt', 'w') as w:
 		for file in os.listdir(path_pdb):
@@ -153,17 +182,21 @@ def features_vector():
 					#w.write(str(nx.laplacian_matrix(G, weight='weight'))+'\n') #Eigenvalue of laplacian, L = D - A
 					w.write(str(nx.normalized_laplacian_matrix(G, weight='weight'))+'\n') #Normalized laplacian matrix, N = D^{-1/2} L D^{-1/2}
 					w.write(str(nx.degree_assortativity_coefficient(G))+'\n') #assortativity coefficient
-					w.write(str(nx.degree_centrality(G))) #global reaching centrality
+					w.write(str(nx.degree_centrality(G))+'\n') #global reaching centrality
 					#***Residue intrinsic dimensionality (may be used to compute 6.?)
 					#***Secondary structure content (helix content + beta strand content)
+					w.write(str(A)+'\n')
+					w.write(str(B)+'\n')
 	
-	print 'Features vector *.txt file has been saved!'
+	print 'Features vector *.txt file has been saved! (original PDB, hydrophobic, charged)'
 
 if __name__ == '__main__':
 	#install('networkx') #satisfied
 	#print(input_nx()) 
 	#print(attributes_graph())
-	name_base()
-	load_hydrophobic()
-	load_charged()
+	#name_base()
+	#print(alpha_content())
+	#print(beta_content())
+	#load_hydrophobic()
+	#load_charged()
 	features_vector()
