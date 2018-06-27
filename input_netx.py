@@ -35,6 +35,8 @@ import MD_cmaps
 path_data = 'Results_data/'
 path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/'
 
+os.path.splitext(path_pdb)[0]
+from os.path import basename
 
 def install(package):
 	subprocess.call([sys.executable, "-m", "pip", "install", package])
@@ -86,9 +88,13 @@ def attributes_graph(n = None):
 	print 'Degree assortativity coefficient: ',nx.degree_assortativity_coefficient(G)
 	
 def name_base():
+	
 	for file in os.listdir(path_pdb):
 		if file.endswith('.pdb') and not file.startswith('hydrophobic') and not file.startswith('charged'):
-			base = file[:4]
+			#base = file[:4]
+			#return base
+			basename = file.split('.')[:-1]
+			base =''.join(basename)
 			return base
 		
 def alpha_content():
@@ -100,10 +106,17 @@ def alpha_content():
 			#print file
 			iter_file = open(file)
 			lines = iter_file.readlines()
-			cryst = lines[0]
+			cryst = ('CRYST1')
+			for line in lines:
+				#print line
+				if cryst in line:
+					#print line
+					for i in range(len(line)):
+						return line[12:18]
+			'''cryst = lines[0]
 			#print cryst
 			for i in range(len(cryst)):
-				return cryst[12:18]
+				return cryst[12:18]'''
 			
 def beta_content():
 	base = name_base()
@@ -113,10 +126,13 @@ def beta_content():
 			#print file
 			iter_file = open(file)
 			lines = iter_file.readlines()
-			cryst = lines[0]
-			#print cryst
-			for i in range(len(cryst)):
-				return cryst[21:27]
+			cryst = ('CRYST1')
+			for line in lines:
+				#print line
+				if cryst in line:
+					#print line
+					for i in range(len(line)):
+						return line[21:27]
 
 def load_hydrophobic():
 	base = name_base()
@@ -185,8 +201,8 @@ def features_vector():
 					w.write(str(nx.degree_centrality(G))+'\n') #global reaching centrality
 					#***Residue intrinsic dimensionality (may be used to compute 6.?)
 					#***Secondary structure content (helix content + beta strand content)
-					w.write(str(A)+'\n')
-					w.write(str(B)+'\n')
+					w.write(str(A)+'\n') #alpha content
+					w.write(str(B)+'\n') #beta content
 	
 	print 'Features vector *.txt file has been saved! (original PDB, hydrophobic, charged)'
 
@@ -195,8 +211,8 @@ if __name__ == '__main__':
 	#print(input_nx()) 
 	#print(attributes_graph())
 	#name_base()
-	#print(alpha_content())
-	#print(beta_content())
+	#alpha_content()
+	#beta_content()
 	#load_hydrophobic()
 	#load_charged()
 	features_vector()
