@@ -33,7 +33,10 @@ sys.path.append(parent_folder);
 import MD_cmaps
 
 path_data = 'Results_data/'
-path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/'
+path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/PDB_edited/'
+feat_path = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/feature_vectors/'
+path_hydro = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/hydrophobic_files/'
+path_charg = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/charged_files/'
 
 os.path.splitext(path_pdb)[0]
 from os.path import basename
@@ -104,7 +107,7 @@ def alpha_content():
 		#print file
 		if file.endswith('.pdb') and not file.startswith('hydrophobic') and not file.startswith('charged'): 
 			#print file
-			iter_file = open(file)
+			iter_file = open((path_pdb+file), 'r')
 			lines = iter_file.readlines()
 			cryst = ('CRYST1')
 			for line in lines:
@@ -112,11 +115,8 @@ def alpha_content():
 				if cryst in line:
 					#print line
 					for i in range(len(line)):
-						return line[12:18]
-			'''cryst = lines[0]
-			#print cryst
-			for i in range(len(cryst)):
-				return cryst[12:18]'''
+						#return line[12:18]
+						return line[9:15]
 			
 def beta_content():
 	base = name_base()
@@ -124,15 +124,16 @@ def beta_content():
 		#print file
 		if file.endswith('.pdb') and not file.startswith('hydrophobic') and not file.startswith('charged'): 
 			#print file
-			iter_file = open(file)
+			iter_file = open((path_pdb+file), 'r')
 			lines = iter_file.readlines()
 			cryst = ('CRYST1')
-			for line in lines:
+			for line in lines: 
 				#print line
 				if cryst in line:
 					#print line
 					for i in range(len(line)):
-						return line[21:27]
+						#return line[21:27]
+						return line[18:24]
 
 def load_hydrophobic():
 	base = name_base()
@@ -170,9 +171,39 @@ def features_vector():
 	A = alpha_content()
 	B = beta_content()
 
-	with open ('features_'+base+'.txt', 'w') as w:
+	with open ((feat_path+('features_'+base+'.txt')), 'w') as w:
 		for file in os.listdir(path_pdb):
-			if file.endswith('.pdb'):
+			w.write(str(float(nx.number_of_edges(G))/float(nx.number_of_nodes(G)))+'\n') #avg degree
+			w.write(str(nx.average_shortest_path_length(G))+'\n') #avg shortest path length
+			w.write(str(nx.diameter(G))+'\n') #diameter (max. shortest path)
+			w.write(str(nx.radius(G))+'\n') #radius (min. shortest path)
+			#w.write(str(nx.clustering(G))) #local clustering coefficient (individual nodes)
+			w.write(str(nx.average_clustering(G))+'\n') #global clustering coefficient
+			#***Number of quasi-rigid domains
+			#w.write(str(nx.laplacian_matrix(G, weight='weight'))+'\n') #Eigenvalue of laplacian, L = D - A
+			w.write(str(nx.normalized_laplacian_matrix(G, weight='weight'))+'\n') #Normalized laplacian matrix, N = D^{-1/2} L D^{-1/2}
+			w.write(str(nx.degree_assortativity_coefficient(G))+'\n') #assortativity coefficient
+			w.write(str(nx.degree_centrality(G))+'\n') #global reaching centrality
+			#***Residue intrinsic dimensionality (may be used to compute 6.?)
+			#***Secondary structure content (helix content + beta strand content)
+			w.write(str(A)+'\n') #alpha content
+			w.write(str(B)+'\n') #beta content
+		for file in os.listdir(path_hydro):
+			#***Average degree of hydrophobic residues (F,M,W,I,V,L,P,A)
+			w.write(str(float(nx.number_of_edges(H))/float(nx.number_of_nodes(H)))+'\n')
+			#***Average local clustering coefficient of hydrophobic residues
+			w.write(str(nx.clustering(H))+'\n')
+			#***Average local reaching centrality of hydrophobic residues
+			w.write(str(nx.local_reaching_centrality(H,3))+'\n') #needs second parameter, the node
+		for file in os.listdir(path_charg):
+			#***Average degree of charged residues (R,D,E,H,K)
+			w.write(str(float(nx.number_of_edges(C))/float(nx.number_of_nodes(C)))+'\n')
+			#***Average local clustering coefficient of charged residues
+			w.write(str(nx.clustering(C))+'\n')
+			#***Average local reaching centrality of charged residues
+			w.write(str(nx.local_reaching_centrality(C,3))+'\n')
+			
+			'''if file.endswith('.pdb'):
 				if file.startswith('hydrophobic'):
 					#***Average degree of hydrophobic residues (F,M,W,I,V,L,P,A)
 					w.write(str(float(nx.number_of_edges(H))/float(nx.number_of_nodes(H)))+'\n')
@@ -202,7 +233,7 @@ def features_vector():
 					#***Residue intrinsic dimensionality (may be used to compute 6.?)
 					#***Secondary structure content (helix content + beta strand content)
 					w.write(str(A)+'\n') #alpha content
-					w.write(str(B)+'\n') #beta content
+					w.write(str(B)+'\n') #beta content'''
 	
 	print 'Features vector *.txt file has been saved! (original PDB, hydrophobic, charged)'
 

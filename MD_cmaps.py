@@ -3,6 +3,9 @@ import sys
 import os
 import time
 
+path_data = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/Results_data/'
+path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/PDB_edited/'
+
 python_path = os.path.dirname(__file__);
 
 next_folder = '';
@@ -22,7 +25,6 @@ from scipy import stats
 from scipy.spatial.distance import squareform, pdist, cdist
 from joblib import Parallel, delayed
 
-path_data = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/Results_data/'
 
 def unwrap_cmap_loop(arg,**kwarg):
 	return MD_cmaps.distance_matrix_loop(*arg,**kwarg);
@@ -380,9 +382,11 @@ class MD_cmaps():
 		if startID == -1:
 			# Do atom selections, save list with all heavy atoms.
 			for i in range(0,self.nResidues):
+				#print i
 				# OBS! query is now done on "residue". Can be a problem for multi-chain proteins. 
 				# Then, switch to resid or feed chains separately.
 				query = "protein and !(type H) and resid " + str(i);
+				#print query
 				tmpInd = self.traj.topology.select(query);
 				self.allInds.append(tmpInd);
 		else:
@@ -394,6 +398,7 @@ class MD_cmaps():
 				# OBS! query is here done on "residue". Can be a problem for multi-chain proteins. 
 				# Then, switch to resid or feed chains separately.
 				query = "protein and !(type H) and residue " + str(i);
+				#print query
 				tmpInd = self.traj.topology.select(query);
 				self.allInds.append(tmpInd);		
 		
@@ -576,11 +581,11 @@ class MD_cmaps():
 			#if file.endswith('.pdb'):
 				#self.traj = md.load_pdb(path_data+file) #args.topology_file
 		if args.topology_file != '':
-			self.traj = md.load_pdb(args.topology_file);
+			self.traj = md.load_pdb(path_pdb+args.topology_file); #added path
 			print(self.traj)
 			self.nResidues = int(self.traj.n_residues);
 			
-	 		if args.frame_frame_side_chain_cmap:
+			if args.frame_frame_side_chain_cmap:
 				self.computeFrameToFrameSideChainContacts(self.traj,args.query);
 			
 			if args.frame_frame_CA_cmap:

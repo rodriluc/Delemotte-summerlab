@@ -3,6 +3,7 @@ import os
 import fileinput
 from glob import glob
 import linecache
+import math
 
 path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/'
 
@@ -72,12 +73,7 @@ def common_feat(): #compiles one feature for all PDBs into another list
 			#line = linecache.getline(fnames, 2)
 			#new_feat.append(line[0])
 			#print new_feat
-			'''if file.endswith('.pdb') and not file.startswith('hydrophobic') and not file.startswith('charged'): 
-				files = open
-				for feat in file:
-					if feat in file:
-						new_feat.append(feat)
-						print new_feat'''
+
 
 def calc_distance1():
 	for file in os.listdir(path_pdb):
