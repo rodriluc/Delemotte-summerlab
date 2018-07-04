@@ -1,30 +1,8 @@
-2 of 6
- 
-back up
-Inbox
-	x
-Lucie Rodriguez <luciest.rodriguez@gmail.com>
-	
-Attachments10:56 AM (6 minutes ago)
-	
-to me
-
-9 Attachments
-	
-Click here to Reply or Forward
-3.19 GB (21%) of 15 GB used
-Manage
-Terms · Privacy · Program Policies
-Last account activity: 0 minutes ago
-Open in 1 other location · Details
-	
-	
-
 #script creates and saves PDB file containing hydrophobic/ charged residues
 
-path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/PDB_edited/'
-path_hydro = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/hydrophobic_files/'
-path_charg = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/charged_files/'
+path_pdb = '/home/lrodriguez/Documents/Delemotte-summerlab/PDB_edited/'
+path_hydro = '/home/lrodriguez/Documents/Delemotte-summerlab/hydrophobic_files/'
+path_charg = '/home/lrodriguez/Documents/Delemotte-summerlab/charged_files/'
 import mdtraj as md
 import os
 

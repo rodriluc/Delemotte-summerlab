@@ -5,7 +5,7 @@ from glob import glob
 import linecache
 import math
 
-path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/'
+path_pdb = '/home/lrodriguez/Documents/Delemotte-summerlab/PDB_edited/'
 
 def find_originfeat():
 	
