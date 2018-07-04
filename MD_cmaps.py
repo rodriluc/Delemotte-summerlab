@@ -581,7 +581,7 @@ class MD_cmaps():
 			#if file.endswith('.pdb'):
 				#self.traj = md.load_pdb(path_data+file) #args.topology_file
 		if args.topology_file != '':
-			self.traj = md.load_pdb(path_pdb+args.topology_file); #added path
+			self.traj = md.load_pdb(args.topology_file); #added path
 			print(self.traj)
 			self.nResidues = int(self.traj.n_residues);
 			

@@ -16,22 +16,24 @@ def strip_pdb():
 
 	for file in os.listdir(path_originpdb):
 		#print file
-		if file == base+'.pdb': 
-			print file
-			iter_file = open((path_originpdb+file), 'r')
-			lines = iter_file.readlines()
-			cryst = ('CRYST1')
-			with open ((path_edit+(base+'.pdb')), 'w') as w:
-				for line in lines:
-					#print line
-					if cryst in line:
+		#if file == base+'.pdb': 
+		if file.endswith('.pdb'):
+			#print file
+			with open((path_originpdb+file), 'r') as lines:
+				#print file
+				#lines = iter_file.readlines()
+				cryst = ('CRYST1')
+				with open ((path_edit+(file)), 'w') as w:
+					for line in lines:
 						#print line
-						w.write(line)
-					elif line.startswith('ATOM'):
-						w.write(line)
-				w.write('END')
+						if cryst in line:
+							#print line
+							w.write(line)
+						elif line.startswith('ATOM'):
+							w.write(line)
+					w.write('END')
 				print 'Stripped PDB ready!'
-			iter_file.close()
+
 
 
 	
