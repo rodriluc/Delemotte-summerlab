@@ -32,12 +32,12 @@ sys.path.append(parent_folder);
 
 import MD_cmaps
 
-path_data = '/home/lrodriguez/Documents/Delemotte-summerlab/Results_data/'
-path_pdb = '/home/lrodriguez/Documents/Delemotte-summerlab/PDB_edited/'
-feat_path = '/home/lrodriguez/Documents/Delemotte-summerlab/feature_vectors/'
-path_hydro = '/home/lrodriguez/Documents/Delemotte-summerlab/hydrophobic_files/'
-path_charg = '/home/lrodriguez/Documents/Delemotte-summerlab/charged_files/'
-path_cmap = '/home/lrodriguez/Documents/Delemotte-summerlab/network_files/'
+path_data = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/Results_data/'
+path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/PDB_edited/'
+feat_path = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/feature_vectors/'
+path_hydro = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/hydrophobic_files/'
+path_charg = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/charged_files/'
+path_cmap = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/network_files/'
 
 os.path.splitext(path_pdb)[0]
 from os.path import basename
@@ -61,7 +61,7 @@ def name_base(path_pdb,file):
 		if file.endswith('.pdb'):
 			basename = file.split('.')[:-1]
 			base =''.join(basename)
-		base_list.append(base)
+			base_list.append(base)
 	return base_list
 
 def input_nx(path_data,base): 

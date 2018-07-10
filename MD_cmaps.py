@@ -3,8 +3,8 @@ import sys
 import os
 import time
 
-path_data = '/home/lrodriguez/Documents/Delemotte-summerlab/Results_data/'
-path_pdb = '/home/lrodriguez/Documents/Delemotte-summerlab/PDB_edited/'
+path_data = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/Results_data/'
+path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/PDB_edited/'
 
 python_path = os.path.dirname(__file__);
 

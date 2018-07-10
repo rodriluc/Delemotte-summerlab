@@ -1,8 +1,8 @@
 #Aim: to strip PDBs, format CRYST1 + ATOM + END
 import os
 
-path_originpdb = '/home/lrodriguez/Documents/Delemotte-summerlab/PDB_files/'
-path_edit = '/home/lrodriguez/Documents/Delemotte-summerlab/PDB_edited/'
+path_originpdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/PDB_files/'
+path_edit = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/PDB_edited/'
 
 def name_base():
 	for file in os.listdir(path_originpdb):
