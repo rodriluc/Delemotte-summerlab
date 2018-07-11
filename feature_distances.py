@@ -4,17 +4,30 @@ import fileinput
 from glob import glob
 import linecache
 import math
-from itertools import combinations
+from itertools import combinations, cycle, islice
 import filemapper as fm
 import numpy as np
+np.set_printoptions(threshold=np.inf)
+
 from scipy.spatial import distance
 from scipy.spatial.distance import pdist, squareform
 import itertools
-from sklearn.cluster import KMeans
-from matplotlib import pyplot as plt
+from sklearn.cluster import KMeans, SpectralClustering
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import scale
+from sklearn import metrics
 
-path_fv = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/feature_vectors/'
-path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/PDB_files/'
+from matplotlib import pyplot as plt
+import pandas as pd
+from functools import partial
+import seaborn
+import collections
+import spectral
+#from spectral import utils, affinity, clustering 
+
+
+path_fv = '/home/lrodriguez/Delemotte-summerlab/feature_vectors/'
+path_pdb = '/home/lrodriguez/Delemotte-summerlab/PDB_files/'
 
 def name_base(path_pdb,file):
 	base_list = []
@@ -37,6 +50,7 @@ def create_array(file):
 
 			#temp.extend(fv)
 			x = np.array(fv)
+			#print x
 			#y = np.append([x],[x], axis=0)
 			temp.append(x)
 			
@@ -62,16 +76,65 @@ def calc_dist1():
 	y = pdist(vec, 'euclidean')
 	#print y
 	z = squareform(y)
-	print z
+
+	return z
 	
 def k_means():
-	z = calc_dist1()
+	#z = calc_dist1()
+	vec = create_array(file)
+	vec = np.asarray(vec)
+
+	#PCA-reduced data
+	reduced_data = PCA(n_components=2).fit_transform(vec) #n_components=3
+
+	model = KMeans(4)
+	model.fit(reduced_data) #vec for k-means full
+	clust_labels = model.labels_
+	centroids = model.cluster_centers_
 	
-	kmeans = KMeans(n_clusters = 2, random_state = 0).fit(z)
+	
+	kmeans = pd.DataFrame(clust_labels)
+	#print(vec.shape)
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	scatf = ax.scatter(reduced_data[:,0],reduced_data[:,1],s=50,c=clust_labels) #when pca comp. = 3 then 1,2
+	ax.set_title('K-means clustering')
+	#plt.colorbar(scatf)
 	plt.show()
-	#print kmeans
+
+	np.savetxt('cluster_indices.txt',clust_labels)
+
 	
 def spectral_cluster():
+
+	Z = calc_dist1()
+	#vec = np.asarray(vec)	
+	#vec = np.matrix(vec) #precomputed, affinity matrix should pass through Gaussian kernel
+
+	#gk = np.exp(-Z**2/(2.*delta**2))
+	#print gk
+
+	'''sc = SpectralClustering(n_clusters=4, affinity='precomputed')
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	scatf = ax.scatter(sc[:,0],sc[:,1],s=50,c=clust_labels)
+	ax.set_title('Spectral clustering')
+	plt.show()'''
+
+	#Spectral Clustering example
+	sc = SpectralClustering(eigen_solver='arpack',affinity='precomputed',assign_labels='discretize').fit(Z) #affinity='rbf'
+	print 'Spectral Clustering'
+	print collections.Counter(sc.labels_)
+	print metrics.silhouette_score(Z, sc.labels_)
+
+	reduced_data = PCA(n_components=2).fit_transform(Z)
+	#plot_2d_data(reduced_data,sc.labels_)
+
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	scatf = ax.scatter(reduced_data[:,0],reduced_data[:,1],s=50,c=sc.labels_)
+	ax.set_title('Spectral clustering')
+	plt.show()
 	
 					
 if __name__ == '__main__':
@@ -80,4 +143,11 @@ if __name__ == '__main__':
 	#calc_dist1()
 	k_means()
 	#spectral_cluster()
+
+
+
+
+
+
+
 
