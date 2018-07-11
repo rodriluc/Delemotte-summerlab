@@ -139,7 +139,7 @@ def features_vector(file): #self
 		A = alpha_content(path_pdb,base_list[i])
 		B = beta_content(path_pdb,base_list[i])
 		with open ((feat_path+('features_'+base_list[i]+'.txt')), 'w') as w: 
-			w.write(str(float(nx.number_of_edges(G))/float(nx.number_of_nodes(G)))+'\n') #avg degree
+			#w.write(str(float(nx.number_of_edges(G))/float(nx.number_of_nodes(G)))+'\n') #removed avg degree
 			w.write(str(nx.average_shortest_path_length(G))+'\n') #avg shortest path length
 			w.write(str(nx.diameter(G))+'\n') #diameter (max. shortest path)
 			w.write(str(nx.radius(G))+'\n') #radius (min. shortest path)
