@@ -1,8 +1,8 @@
 #script creates and saves PDB file containing hydrophobic/ charged residues
 
-path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/PDB_edited/'
-path_hydro = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/hydrophobic_files/'
-path_charg = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/charged_files/'
+path_pdb = '/home/lrodriguez/Delemotte-summerlab/PDB_edited/'
+path_hydro = '/home/lrodriguez/Delemotte-summerlab/hydrophobic_files/'
+path_charg = '/home/lrodriguez/Delemotte-summerlab/charged_files/'
 import mdtraj as md
 import os
 

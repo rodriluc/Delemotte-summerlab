@@ -32,12 +32,12 @@ sys.path.append(parent_folder);
 
 import MD_cmaps
 
-path_data = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/Results_data/'
-path_pdb = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/PDB_edited/'
-feat_path = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/feature_vectors/'
-path_hydro = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/hydrophobic_files/'
-path_charg = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/charged_files/'
-path_cmap = '/afs/kth.se/home/l/u/lucier/Documents/protein_networks/network_files/'
+path_data = '/home/lrodriguez/Delemotte-summerlab/Results_data/'
+path_pdb = '/home/lrodriguez/Delemotte-summerlab/PDB_edited/'
+feat_path = '/home/lrodriguez/Delemotte-summerlab/feature_vectors/'
+path_hydro = '/home/lrodriguez/Delemotte-summerlab/hydrophobic_files/'
+path_charg = '/home/lrodriguez/Delemotte-summerlab/charged_files/'
+path_cmap = '/home/lrodriguez/Delemotte-summerlab/network_files/'
 
 os.path.splitext(path_pdb)[0]
 from os.path import basename
@@ -140,24 +140,24 @@ def features_vector(file): #self
 		B = beta_content(path_pdb,base_list[i])
 		with open ((feat_path+('features_'+base_list[i]+'.txt')), 'w') as w: 
 			#w.write(str(float(nx.number_of_edges(G))/float(nx.number_of_nodes(G)))+'\n') #removed avg degree
-			w.write(str(nx.average_shortest_path_length(G))+'\n') #avg shortest path length
-			w.write(str(nx.diameter(G))+'\n') #diameter (max. shortest path)
-			w.write(str(nx.radius(G))+'\n') #radius (min. shortest path)
-			w.write(str(nx.average_clustering(G))+'\n') #global clustering coefficient
+			w.write(str(nx.average_shortest_path_length(G)/(((log(float(nx.number_of_nodes(G))))-0.5772)/(log((float(nx.number_of_edges(G)))/float(nx.number_of_nodes(G)))+0.5))+'\n') #avg shortest path length
+			w.write(str(log((float(nx.number_of_nodes(G))))/log((float(nx.number_of_edges(G))/float(nx.number_of_nodes(G)))))+'\n') #diameter (max. shortest path)
+			w.write(str(nx.radius(G)/nx.average_shortest_path_length(G))+'\n') #radius (min. shortest path)
+			w.write(str(nx.average_clustering(G)/((nx.average_shortest_path_length(G)/float(nx.number_of_nodes(G)))))+'\n') #clustering coefficient of random graph
 			#***Number of quasi-rigid domains
 			w.write(str(nx.degree_assortativity_coefficient(G))+'\n') #assortativity coefficient
 			w.write(str(nx.global_reaching_centrality(G))+'\n') #nx.degree_centrality(G)
 			#***Residue intrinsic dimensionality (may be used to compute 6.?)
-			w.write(str(L)+'\n') #Normalized laplacian matrix, N = D^{-1/2} L D^{-1/2}
-			w.write(str(A)+'\n') #alpha content 
-			w.write(str(B)+'\n') #beta content
+			w.write(str(L)+'\n') #Normalized laplacian walk from function, N = D^{-1/2} L D^{-1/2}
+			w.write(str(A/(A+B))+'\n') #alpha content 
+			w.write(str(B/(A+B))+'\n') #beta content
 	
 			w.write(str(float(nx.number_of_edges(H))/float(nx.number_of_nodes(H)))+'\n') #***Average degree of hydrophobic residues (F,M,W,I,V,L,P,A)
-			w.write(str(nx.average_clustering(H))+'\n') #***Average local clustering coefficient of hydrophobic residues
+			w.write(str(nx.average_clustering(H)/((nx.average_shortest_path_length(H)/float(nx.number_of_nodes(H)))))+'\n') #clustering coefficient of random graph - hydrophobic residues
 			w.write(str(nx.global_reaching_centrality(H))+'\n') #global, Average local reaching centrality of hydrophobic residues
 	
 			w.write(str(float(nx.number_of_edges(C))/float(nx.number_of_nodes(C)))+'\n') #***Average degree of charged residues (R,D,E,H,K)
-			w.write(str(nx.average_clustering(C))+'\n') #***Average local clustering coefficient of charged residues
+			w.write(str(nx.average_clustering(C)/((nx.average_shortest_path_length(C)/float(nx.number_of_nodes(C)))))+'\n') #clustering coefficient of random graph - charged residues
 			w.write(str(nx.global_reaching_centrality(C))+'\n') #global, Average local reaching centrality of charged residues
 	
 	print 'Features vector *.txt file has been saved! (original PDB, hydrophobic, charged)'
