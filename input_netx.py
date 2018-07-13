@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env
+from __future__ import division
 import argparse
 import networkx as nx
 import numpy as np
@@ -16,6 +17,7 @@ import mdtraj as md
 import itertools
 import pandas as pd
 import re
+import math 
 
 python_path = os.path.dirname(__file__);
 
@@ -140,24 +142,28 @@ def features_vector(file): #self
 		B = beta_content(path_pdb,base_list[i])
 		with open ((feat_path+('features_'+base_list[i]+'.txt')), 'w') as w: 
 			#w.write(str(float(nx.number_of_edges(G))/float(nx.number_of_nodes(G)))+'\n') #removed avg degree
-			w.write(str(nx.average_shortest_path_length(G)/(((log(float(nx.number_of_nodes(G))))-0.5772)/(log((float(nx.number_of_edges(G)))/float(nx.number_of_nodes(G)))+0.5))+'\n') #avg shortest path length
-			w.write(str(log((float(nx.number_of_nodes(G))))/log((float(nx.number_of_edges(G))/float(nx.number_of_nodes(G)))))+'\n') #diameter (max. shortest path)
+
+			w.write(str(nx.average_shortest_path_length(G)/(((math.log(float(nx.number_of_nodes(G))))-0.5772)/((math.log(float(nx.number_of_edges(G)))/(float(nx.number_of_nodes(G))))+0.5)))+'\n') #avg shortest path length
+			w.write(str(nx.diameter(G)/(math.log((float(nx.number_of_nodes(G))))/(math.log(float(nx.number_of_edges(G))/float(nx.number_of_nodes(G))))))+'\n') #diameter 
 			w.write(str(nx.radius(G)/nx.average_shortest_path_length(G))+'\n') #radius (min. shortest path)
-			w.write(str(nx.average_clustering(G)/((nx.average_shortest_path_length(G)/float(nx.number_of_nodes(G)))))+'\n') #clustering coefficient of random graph
+			w.write(str(nx.average_clustering(G)/((float(nx.number_of_edges(G))/float(nx.number_of_nodes(G)))/float(nx.number_of_nodes(G))))+'\n') #clustering coefficient of random graph
 			#***Number of quasi-rigid domains
 			w.write(str(nx.degree_assortativity_coefficient(G))+'\n') #assortativity coefficient
 			w.write(str(nx.global_reaching_centrality(G))+'\n') #nx.degree_centrality(G)
 			#***Residue intrinsic dimensionality (may be used to compute 6.?)
 			w.write(str(L)+'\n') #Normalized laplacian walk from function, N = D^{-1/2} L D^{-1/2}
-			w.write(str(A/(A+B))+'\n') #alpha content 
-			w.write(str(B/(A+B))+'\n') #beta content
+			w.write(str(float(A)/(float(A)+float(B)))+'\n') #alpha content 
+			w.write(str(float(B)/(float(A)+float(B)))+'\n') #beta content
 	
 			w.write(str(float(nx.number_of_edges(H))/float(nx.number_of_nodes(H)))+'\n') #***Average degree of hydrophobic residues (F,M,W,I,V,L,P,A)
-			w.write(str(nx.average_clustering(H)/((nx.average_shortest_path_length(H)/float(nx.number_of_nodes(H)))))+'\n') #clustering coefficient of random graph - hydrophobic residues
+			w.write(str((float(nx.average_clustering(G))/((float(nx.number_of_edges(G))/float(nx.number_of_nodes(G)))/float(nx.number_of_nodes(G))))/(float(nx.average_clustering(H))/((float(nx.number_of_edges(H))/float(nx.number_of_nodes(H)))/float(nx.number_of_nodes(H)))))+'\n') #clustering coefficient of random graph - hydrophobic residues
 			w.write(str(nx.global_reaching_centrality(H))+'\n') #global, Average local reaching centrality of hydrophobic residues
 	
 			w.write(str(float(nx.number_of_edges(C))/float(nx.number_of_nodes(C)))+'\n') #***Average degree of charged residues (R,D,E,H,K)
-			w.write(str(nx.average_clustering(C)/((nx.average_shortest_path_length(C)/float(nx.number_of_nodes(C)))))+'\n') #clustering coefficient of random graph - charged residues
+			try:
+				w.write(str((float(nx.average_clustering(G))/((float(nx.number_of_edges(G))/float(nx.number_of_nodes(G)))/float(nx.number_of_nodes(G))))/(float(nx.average_clustering(C))/((float(nx.number_of_edges(C))/float(nx.number_of_nodes(C)))/float(nx.number_of_nodes(C)))))+'\n') #clustering coefficient of random graph - charged residues
+			except ZeroDivisionError:
+				w.write('0.0'+'\n')
 			w.write(str(nx.global_reaching_centrality(C))+'\n') #global, Average local reaching centrality of charged residues
 	
 	print 'Features vector *.txt file has been saved! (original PDB, hydrophobic, charged)'

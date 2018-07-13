@@ -3,21 +3,21 @@
 #Overall aim: to save feature vectors
 
 # Strip PDB files in correct format
-cd PDB_files
-for file in *.pdb
-do
-echo $file
-python /home/lrodriguez/Delemotte-summerlab/strip_pdb.py
-done
-cd ..
+#cd PDB_files
+#for file in *.pdb
+#do
+#echo $file
+#python /home/lrodriguez/Delemotte-summerlab/strip_pdb.py
+#done
+#cd ..
 # Create individual PDB files for hydrophobic and charged residues
-cd PDB_edited
-for file in *pdb
-do
-echo $file
-python /home/lrodriguez/Delemotte-summerlab/create_pdb.py 
-done
-cd ..
+#cd PDB_edited
+#for file in *pdb
+#do
+#echo $file
+#python /home/lrodriguez/Delemotte-summerlab/create_pdb.py 
+#done
+#cd ..
 # Compute side-chain distance map from all PDBs now
 cd PDB_edited
 for file in *.pdb
