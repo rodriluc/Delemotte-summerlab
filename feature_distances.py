@@ -26,8 +26,8 @@ import spectral
 #from spectral import utils, affinity, clustering 
 
 
-path_fv = '/home/lrodriguez/Delemotte-summerlab/feature_vectors/'
-path_pdb = '/home/lrodriguez/Delemotte-summerlab/PDB_files/'
+path_fv = '/home/lrodriguez/Delemotte-summerlab_ERnorm_100ER_4.5A/feature_vectors/'
+path_pdb = '/home/lrodriguez/Delemotte-summerlab_ERnorm_100ER_4.5A/PDB_files/'
 
 def name_base(path_pdb,file):
 	base_list = []

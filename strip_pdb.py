@@ -1,8 +1,8 @@
 #Aim: to strip PDBs, format CRYST1 + ATOM + END
 import os
 
-path_originpdb = '/home/lrodriguez/Delemotte-summerlab/PDB_files/'
-path_edit = '/home/lrodriguez/Delemotte-summerlab/PDB_edited/'
+path_originpdb = '/data2/LucieR/Delemotte-summerlab_ERnorm_100ER_4.5A/PDB_files/'
+path_edit = '/data2/LucieR/Delemotte-summerlab_ERnorm_100ER_4.5A/PDB_edited/'
 
 def name_base():
 	for file in os.listdir(path_originpdb):
@@ -22,11 +22,11 @@ def strip_pdb():
 			with open((path_originpdb+file), 'r') as lines:
 				#print file
 				#lines = iter_file.readlines()
-				cryst = ('CRYST1')
+				#cryst = ('CRYST1')
 				with open ((path_edit+(file)), 'w') as w:
 					for line in lines:
 						#print line
-						if cryst in line:
+						if line.startswith('CRYST1'):
 							#print line
 							w.write(line)
 						elif line.startswith('ATOM'):

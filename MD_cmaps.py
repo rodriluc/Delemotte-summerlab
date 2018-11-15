@@ -3,8 +3,8 @@ import sys
 import os
 import time
 
-path_data = '/home/lrodriguez/Delemotte-summerlab/Results_data/'
-path_pdb = '/home/lrodriguez/Delemotte-summerlab/PDB_edited/'
+path_data = '/data2/LucieR/Delemotte-summerlab_ERnorm_100ER_4.5A/Results_data/'
+path_pdb = '/data2/LucieR/Delemotte-summerlab_ERnorm_100ER_4.5A/PDB_edited/'
 
 python_path = os.path.dirname(__file__);
 
@@ -124,7 +124,7 @@ class MD_cmaps():
 				atom_pairs[counter,0] = inds1[k];
 				atom_pairs[counter,1] = inds2[l];
 				counter += 1;
-		atom_pairs = atom_pairs[0:counter-1,::];
+		atom_pairs = atom_pairs[0:counter,::]; #[0:counter,-1::]
 		
 		return atom_pairs;
 
