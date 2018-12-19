@@ -21,12 +21,12 @@ import seaborn as sns
 import hdbscan
 from mpl_toolkits.mplot3d import Axes3D
 
-path_fv = '/data2/LucieR/Delemotte-summerlab_ERnorm_4.5A/feature_vectors/'
-path_pdb = '/data2/LucieR/Delemotte-summerlab_ERnorm_4.5A/PDB_edited/'
-path_gpcr = '/data2/LucieR/Delemotte-summerlab_ERnorm_4.5A/fv_gpcr/'
-path_ic = '/data2/LucieR/Delemotte-summerlab_ERnorm_4.5A/fv_ionchannel/'
-path_enz = '/data2/LucieR/Delemotte-summerlab_ERnorm_4.5A/fv_enzyme/'
-path_kin = '/data2/LucieR/Delemotte-summerlab_ERnorm_4.5A/fv_kinase/'
+path_fv = '/data2/LucieR/Delemotte-summerlab_ERnorm_100ER_4.5A/feature_vectors/'
+path_pdb = '/data2/LucieR/Delemotte-summerlab_ERnorm_100ER_4.5A/PDB_edited/'
+path_gpcr = '/data2/LucieR/Delemotte-summerlab_ERnorm_100ER_4.5A/fv_gpcr/'
+path_ic = '/data2/LucieR/Delemotte-summerlab_ERnorm_100ER_4.5A/fv_ionchannel/'
+path_enz = '/data2/LucieR/Delemotte-summerlab_ERnorm_100ER_4.5A/fv_enzyme/'
+path_kin = '/data2/LucieR/Delemotte-summerlab_ERnorm_100ER_4.5A/fv_kinase/'
 
 def name_base(path_pdb,file):
 	base_list = []
@@ -1022,9 +1022,9 @@ if __name__ == '__main__':
 	#create_barplots()
 	#avg_barplot()
 	#avg_byfeat_barplot()
-	#cluster_norm()
+	cluster_norm()
 	#spectral_cluster()
-	avg_feat_cluster()
+	#avg_feat_cluster()
 	#avg_famiy_cluster()
 	#avg_famfeat_cluster()
 	#cluster_3D()

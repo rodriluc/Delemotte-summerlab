@@ -289,7 +289,7 @@ def gauss_kde():
 	xmin, xmax = x.min(), x.max()
 	ymin, ymax = y.min(),y.max()
 	#zmin, ymax = y.min(),y.max()
-	#Kernel density estimate on data using h = Scott's rule (bandwidth)
+	#Kernel density estimate on data using calcualted sigma
 	bw = 0.21
 	X, Y = np.mgrid[xmin:xmax:100j, ymin:ymax:100j]
 	positions = np.vstack([X.ravel(), Y.ravel()])
@@ -351,7 +351,7 @@ def sigma_test():
 				d_xval2 = (np.exp(-((np.power((item_val-item_train),2))/(2*np.power(sig,2)))))
 		d_xval = (1/(n*np.sqrt(2*np.pi*sig)))*(np.sum(d_xval2))
 		log_d = np.log(d_xval)
-		#print log_d
+		#print log_d 
 		sum_log = np.sum(log_d)
 		temp.append([sig, sum_log])
 	#print temp
@@ -480,9 +480,9 @@ def sns_plot():
 	mlab.show()
 
 if __name__ == '__main__':
-	#pca_weight()
+	pca_weight()
 	#heatmap_pca()
-	gauss_kde()
+	#gauss_kde()
 	#sigma_test()
 	#avg_sigma()
 	#hist_plot()

@@ -69,8 +69,9 @@ def input_nx(path_data,base):
 
 	A = np.loadtxt(path_data+'cmap_processed_'+base+'.txt', dtype=float, unpack=True) 
 	B = np.matrix(np.array(A))
+	#print B
 	G = nx.from_numpy_matrix(B)
-
+	print G
 	nx.draw(G)
 
 	plt.show()
@@ -134,7 +135,7 @@ def erdos_renyi_lap(G): #ER build graphs based on individual proteins, so number
 	N = nx.number_of_nodes(G)
 	E = nx.number_of_edges(G)
 	prob_edges = (((N*(N-1))/2)/E)/100
-	for i in range(100):
+	for i in range(10):
 		er_graph = nx.erdos_renyi_graph(N,prob_edges,seed=None) #number of nodes, probability for edge creation
 		lap = nx.normalized_laplacian_matrix(er_graph, weight='weight')
 		lap = np.eye(lap.shape[0])-lap 
